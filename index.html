@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>%SITE_TITLE%</title>
+    <meta name="description" content="%SITE_DESCRIPTION%" />
+    <!-- Keep the page out of search engines; it's shared by link. Remove if you want it indexed. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="theme-color" content="#05060f" />
+    <meta property="og:title" content="%SITE_TITLE%" />
+    <meta property="og:description" content="%SITE_DESCRIPTION%" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>" />
+  </head>
+  <body>
+    <canvas id="stars" aria-hidden="true"></canvas>
+    <div class="nebula" aria-hidden="true"></div>
+    <div class="cursor-glow" aria-hidden="true"></div>
+
+    <header class="nav" id="nav">
+      <a href="#hero" class="nav-logo"><span class="logo-star">✦</span> <span data-bind="firstName">Joel</span></a>
+      <nav class="nav-links">
+        <a href="#journey">Journey</a>
+        <a href="#constellation">Constellation</a>
+        <a href="#messages">Messages</a>
+        <a href="#videos">Videos</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="btn btn-ghost btn-sm" id="slideshowBtn" title="Fullscreen slideshow for the farewell party">▶ Slideshow</button>
+        <a href="#submit" class="btn btn-primary btn-sm">Leave a message</a>
+      </div>
+    </header>
+
+    <main>
+      <!-- 1. HERO -->
+      <section id="hero" class="hero">
+        <div class="hero-avatar" id="heroAvatar">
+          <div class="orbit orbit-1"><span></span></div>
+          <div class="orbit orbit-2"><span></span></div>
+          <div class="orbit orbit-3"><span></span></div>
+          <div class="avatar-core" id="avatarCore"></div>
+        </div>
+        <p class="eyebrow hero-anim">Farewell &amp; Thank You</p>
+        <h1 class="hero-title hero-anim"><span class="gradient-text" data-bind="firstName">Joel</span></h1>
+        <p class="hero-role hero-anim" id="heroRole"></p>
+        <p class="hero-tagline hero-anim" data-bind="tagline"></p>
+        <div class="countdown hero-anim" id="countdown" hidden></div>
+        <div class="hero-cta hero-anim">
+          <a href="#submit" class="btn btn-primary">✦ Add your star</a>
+          <a href="#messages" class="btn btn-ghost">Read messages</a>
+        </div>
+        <a href="#journey" class="scroll-hint" aria-label="Scroll down"><span></span></a>
+      </section>
+
+      <!-- 2. JOURNEY -->
+      <section id="journey" class="section">
+        <div class="section-head reveal">
+          <p class="eyebrow">01 — The Journey</p>
+          <h2>Mission log</h2>
+          <p class="lead" data-bind="intro"></p>
+        </div>
+        <div class="timeline" id="timeline">
+          <div class="timeline-line"><div class="timeline-progress" id="timelineProgress"></div></div>
+        </div>
+      </section>
+
+      <!-- 3. CONSTELLATION -->
+      <section id="constellation" class="section">
+        <div class="section-head reveal">
+          <p class="eyebrow">02 — Constellation of Thanks</p>
+          <h2>Every message is a star</h2>
+          <p class="lead">Hover a star to see who left it. Click to read their message. The constellation changes with every visit.</p>
+        </div>
+        <div class="stats reveal">
+          <div class="stat"><strong id="statMessages">0</strong><span>Messages</span></div>
+          <div class="stat"><strong id="statVideos">0</strong><span>Videos</span></div>
+          <div class="stat"><strong id="statTeams">0</strong><span>Teams</span></div>
+        </div>
+        <div class="constellation-wrap reveal">
+          <canvas id="constellationCanvas"></canvas>
+          <div class="star-tooltip" id="starTooltip"></div>
+        </div>
+      </section>
+
+      <!-- 4. MESSAGES -->
+      <section id="messages" class="section">
+        <div class="section-head reveal">
+          <p class="eyebrow">03 — Transmissions</p>
+          <h2>Messages for <span data-bind="firstName">Joel</span></h2>
+        </div>
+        <div class="wall" id="wall"></div>
+        <p class="empty" id="wallEmpty" hidden>No messages yet — be the first star in the sky. ✨</p>
+      </section>
+
+      <!-- 5. VIDEOS -->
+      <section id="videos" class="section">
+        <div class="section-head reveal">
+          <p class="eyebrow">04 — Video Signals</p>
+          <h2>Video messages</h2>
+        </div>
+        <div class="video-grid" id="videoGrid"></div>
+        <p class="empty" id="videoEmpty" hidden>No video messages yet. 🎬</p>
+      </section>
+
+      <!-- 6. SUBMIT -->
+      <section id="submit" class="section">
+        <div class="section-head reveal">
+          <p class="eyebrow">05 — Add Your Star</p>
+          <h2>Leave a message</h2>
+          <p class="lead">Write a note, attach photos, and/or send a short video. Your message appears publicly once submitted.</p>
+          <p class="deadline" id="deadline" hidden></p>
+        </div>
+
+        <form class="form glass reveal" id="form" novalidate>
+          <div class="row">
+            <label class="field">
+              <span>Your name *</span>
+              <input name="name" maxlength="80" required autocomplete="name" placeholder="Your name" />
+            </label>
+            <label class="field">
+              <span>Team / Role</span>
+              <input name="team" maxlength="80" placeholder="e.g. Infrastructure" />
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Your message *</span>
+            <textarea name="message" maxlength="1500" rows="6" required placeholder="Share a memory, a thank-you, or wishes for the next chapter…"></textarea>
+            <small class="counter"><span id="charCount">0</span> / 1500</small>
+          </label>
+
+          <div class="row">
+            <div class="field">
+              <span>Photos (optional, up to 4)</span>
+              <label class="file-field">
+                <input type="file" name="photo" accept="image/*" multiple />
+                <div class="file-drop"><b>📷 Choose photos</b><small>JPG / PNG — auto-resized · shown in the slideshow</small></div>
+              </label>
+              <div class="photo-previews" id="photoPreviews"></div>
+            </div>
+
+            <div class="field">
+              <span>Video (optional)</span>
+              <div class="tabs" role="tablist">
+                <button type="button" class="tab active" data-tab="upload">Upload file</button>
+                <button type="button" class="tab" data-tab="link">Paste link</button>
+              </div>
+              <label class="file-field" data-pane="upload">
+                <input type="file" name="video" accept="video/mp4,video/quicktime,video/webm" />
+                <div class="file-drop"><b>🎬 Choose a video</b><small>MP4 / MOV — max 20 MB</small></div>
+                <small class="file-name" id="videoName"></small>
+              </label>
+              <label data-pane="link" hidden>
+                <input name="video_link" type="url" placeholder="https://youtu.be/…  (YouTube, Vimeo, Google Drive)" />
+              </label>
+            </div>
+          </div>
+
+          <!-- Honeypot: bots fill this, humans never see it -->
+          <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <label class="consent">
+            <input type="checkbox" name="consent" required />
+            <span>I agree that my name, message, photo and video will be shown publicly on this page.</span>
+          </label>
+
+          <div class="progress" id="progress" hidden><div class="progress-bar" id="progressBar"></div><span id="progressText"></span></div>
+          <p class="form-error" id="formError" role="alert"></p>
+
+          <button class="btn btn-primary btn-lg" type="submit" id="submitBtn">✦ Send to the stars</button>
+        </form>
+        <section class="submission-receipt glass" id="submissionReceipt" hidden tabindex="-1" aria-labelledby="receiptTitle">
+          <h3 id="receiptTitle">Save your private deletion link</h3>
+          <p id="receiptHelp"></p>
+          <p id="receiptContact" hidden></p>
+          <label class="field"><span>Private deletion link</span><input id="deleteLink" readonly /></label>
+          <button type="button" class="btn btn-ghost" id="copyDeleteLink">Copy deletion link</button>
+          <button type="button" class="btn btn-ghost" id="withdrawAttempt" hidden>Withdraw this attempt and start again</button>
+          <p id="copyLinkStatus" role="status"></p>
+        </section>
+      </section>
+
+      <!-- 7. FINALE -->
+      <section id="finale" class="finale">
+        <p class="eyebrow reveal">Until our orbits cross again</p>
+        <h2 class="finale-title reveal">Thank you, <span class="gradient-text" data-bind="firstName">Joel</span>.</h2>
+        <p class="lead reveal" data-bind="closing"></p>
+        <button class="btn btn-primary btn-lg reveal" id="fireworksBtn">🎆 Celebrate</button>
+        <p class="signed reveal" data-bind="signedBy"></p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Made with ✦ by the team</span>
+      <span id="modeBadge"></span>
+    </footer>
+
+    <section class="deletion-view glass" id="deletionView" hidden tabindex="-1" aria-labelledby="deletionTitle">
+      <h1 id="deletionTitle">Withdraw your message</h1>
+      <p id="deletionStatus" role="status" aria-live="polite"></p>
+      <button class="btn btn-primary" id="confirmDeletion" hidden>Yes, delete my message and attachments</button>
+      <a class="btn btn-ghost" id="backToSite" href="./">Back to the farewell page</a>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal" id="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card glass" role="dialog" aria-modal="true">
+        <button class="modal-close" data-close aria-label="Close">×</button>
+        <div id="modalBody"></div>
+      </div>
+    </div>
+
+    <!-- Slideshow -->
+    <div class="slideshow" id="slideshow" hidden>
+      <div class="ss-bg" aria-hidden="true"></div>
+      <div class="ss-drift" aria-hidden="true"></div>
+      <div class="ss-vignette" aria-hidden="true"></div>
+      <div class="ss-progress"><div class="ss-progress-bar"></div></div>
+      <div class="slide"></div>
+      <div class="slide-controls">
+        <button class="btn btn-ghost btn-sm ss-prev" aria-label="Previous">‹</button>
+        <span class="ss-count"></span>
+        <button class="btn btn-ghost btn-sm ss-next" aria-label="Next">›</button>
+        <button class="btn btn-ghost btn-sm ss-close">Exit</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
