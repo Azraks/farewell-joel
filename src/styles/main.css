@@ -19,7 +19,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 80px;
+  scroll-padding-top: var(--nav-height, 80px);
 }
 
 body {
@@ -407,8 +407,9 @@ h2 {
 }
 
 .scroll-hint {
-  position: absolute;
-  bottom: 2rem;
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 2rem;
   width: 26px;
   height: 42px;
   border: 2px solid rgba(255,255,255,0.3);
@@ -1655,4 +1656,144 @@ input::placeholder, textarea::placeholder {
   margin: 0.4rem 0 0;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+
+/* Curated homepage memories sit behind the existing title and actions. */
+.hero {
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.hero-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(4, 5, 13, 0.35), rgba(4, 5, 13, 0.65) 65%, var(--bg)),
+    radial-gradient(ellipse at center, rgba(4, 5, 13, 0.4), transparent);
+}
+
+.hero-memory {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.hero-memory.is-visible {
+  opacity: 1;
+  animation: hero-memory-drift 8s ease-out both;
+}
+
+@keyframes hero-memory-drift {
+  from { transform: scale(1.02); }
+  to { transform: scale(1.08); }
+}
+
+@media (max-width: 600px) {
+  .hero-memory.is-visible { animation: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-memory { transition: none; }
+  .hero-memory.is-visible { animation: none; }
+}
+
+/* Full photos without the homepage crop or overlay. */
+.hero-cta {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.memory-dialog {
+  width: min(1100px, calc(100vw - 2rem));
+  max-height: calc(100svh - 2rem);
+  padding: 1rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  background: #0b0d22;
+  color: var(--text);
+  overflow: auto;
+}
+
+.memory-dialog::backdrop {
+  background: rgba(2, 3, 10, 0.9);
+}
+
+.memory-dialog-header,
+.memory-photo-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.memory-dialog-header {
+  justify-content: flex-end;
+}
+
+.memory-photo-stage {
+  height: min(58svh, 650px);
+  background: #04050d;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.memory-photo-stage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.memory-photo-controls {
+  margin-block: 1rem;
+}
+
+.memory-photo-thumbs {
+  display: flex;
+  gap: 0.6rem;
+  overflow-x: auto;
+  padding: 0.25rem;
+}
+
+.memory-photo-thumb {
+  flex: 0 0 80px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.memory-photo-thumb img {
+  display: block;
+  width: 100%;
+  height: 60px;
+  object-fit: cover;
+}
+
+.memory-photo-thumb[aria-pressed="true"] {
+  border-color: var(--violet);
+}
+
+.memory-photo-thumb:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .memory-photo-controls .btn { padding: 0.65rem 0.8rem; }
+  .memory-photo-stage { height: 48svh; }
 }

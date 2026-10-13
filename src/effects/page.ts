@@ -6,6 +6,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 export function setupAnimations() {
   const nav = query('#nav');
+  // Match fragment navigation to the header at every viewport size.
+  const updateNavHeight = () => {
+    document.documentElement.style.setProperty('--nav-height', `${nav.getBoundingClientRect().height}px`);
+  };
+  updateNavHeight();
+  new ResizeObserver(updateNavHeight).observe(nav);
   const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 40);
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
@@ -20,7 +26,7 @@ export function setupAnimations() {
 
   gsap.from('.hero-avatar', { scale: 0, opacity: 0, duration: 1.4, delay: 1.2, ease: 'elastic.out(1, 0.6)' });
   // Keep button gradients out of the blur layer to avoid repaint artifacts on navigation.
-  gsap.from('.hero-anim:not(.hero-cta)', { y: 40, opacity: 0, filter: 'blur(10px)', duration: 1.1, stagger: 0.12, delay: 1.5, ease: 'power3.out', clearProps: 'filter' });
+  gsap.from('.hero-anim:not(.hero-cta):not(.hero-title)', { y: 40, opacity: 0, filter: 'blur(10px)', duration: 1.1, stagger: 0.12, delay: 1.5, ease: 'power3.out', clearProps: 'filter' });
   gsap.from('.hero-cta', { y: 40, opacity: 0, duration: 1.1, delay: 2.1, ease: 'power3.out', clearProps: 'transform,opacity' });
 
   gsap.set('.reveal', { opacity: 0 });

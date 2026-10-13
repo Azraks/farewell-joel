@@ -15,6 +15,8 @@ import {
   setupTributeModal, setupWallResize, videoHtml,
 } from './features/tributes';
 import { countUp, revealVideos, setupAnimations } from './effects/page';
+import { setupHeroPhotos } from './features/hero-photos';
+import { setupHeroMedia } from './effects/hero-media';
 import { startStarfield } from './effects/starfield';
 import { createConstellation } from './effects/constellation';
 import { fireworks } from './effects/celebrate';
@@ -54,10 +56,21 @@ async function main() {
   query('#slideshowBtn').addEventListener('click', slideshow.open);
 
   setupAnimations();
+  setupHeroMedia();
+  setupHeroPhotos();
   setupForm(() => refreshTributes(false));
   query('#fireworksBtn').addEventListener('click', () => fireworks());
 
+  const initialHash = window.location.hash;
   await refreshTributes(true);
+  // The wall/gallery change page height after the browser's initial fragment scroll.
+  // Restore the requested section only at startup, never after a new submission.
+  if (window.location.hash === initialHash && /^#[a-z][a-z0-9-]*$/i.test(initialHash)) {
+    const section = document.getElementById(initialHash.slice(1));
+    if (section?.tagName === 'SECTION' && !section.hidden) {
+      requestAnimationFrame(() => section.scrollIntoView({ behavior: 'instant', block: 'start' }));
+    }
+  }
 
   async function refreshTributes(animateCounters: boolean) {
     try {

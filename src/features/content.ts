@@ -1,6 +1,6 @@
 import { site } from '../config';
 import { isDemo, isLive, isTestSubmission } from '../lib/environment';
-import { escapeHtml, initials } from '../lib/media';
+import { escapeHtml } from '../lib/media';
 import { query } from '../lib/ui';
 
 export async function bindContent() {
@@ -22,7 +22,7 @@ export async function bindContent() {
   if (site.honoree.photo) {
     core.innerHTML = `<img src="${escapeHtml(site.honoree.photo)}" alt="${escapeHtml(site.honoree.fullName)}" />`;
   } else {
-    core.textContent = initials(site.honoree.fullName);
+    core.textContent = 'TJ';
   }
 
   const milestones = import.meta.env.VITE_DEMO_MODE === 'true'
