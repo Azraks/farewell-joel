@@ -50,7 +50,7 @@ async function main() {
   const slideshow = createSlideshow({
     root: query('#slideshow'),
     getTributes: () => tributes,
-    videoHtml: (t) => videoHtml(t),
+    videoHtml: (t, autoplay = false) => videoHtml(t, autoplay),
     onEmpty: () => toast('No messages to show yet.'),
   });
   query('#slideshowBtn').addEventListener('click', slideshow.open);

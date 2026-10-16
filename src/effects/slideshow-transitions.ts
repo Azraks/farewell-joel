@@ -73,7 +73,7 @@ export function animateSlide(slide: HTMLElement, transition: Transition): gsap.c
     case 'postcard':
       if (photos.length) {
         timeline.fromTo(photos, { opacity: 0, scale: 0.5, y: 120, rotation: -25 },
-          { opacity: 1, scale: 1, y: 0, rotation: (index: number) => [-6, 5, -2][index] ?? 0,
+          { opacity: 1, scale: 1, y: 0, rotation: (index: number) => [-4, 3, -2, 2][index] ?? 0,
             duration: 1.3, stagger: 0.18, ease: 'back.out(1.4)' }, 0);
       }
       // Keep playable video upright; only photo cards receive the rotation.

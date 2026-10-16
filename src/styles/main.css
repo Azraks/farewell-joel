@@ -1296,7 +1296,7 @@ input::placeholder, textarea::placeholder {
   place-items: center;
   padding: 4rem clamp(1.5rem, 5vw, 5rem) 6rem;
   background: #03040c;
-  overflow: hidden;
+  overflow: clip;
 }
 
 .ss-bg, .ss-drift, .ss-vignette {
@@ -1796,4 +1796,223 @@ input::placeholder, textarea::placeholder {
 @media (max-width: 480px) {
   .memory-photo-controls .btn { padding: 0.65rem 0.8rem; }
   .memory-photo-stage { height: 48svh; }
+}
+
+/* Each colleague keeps one slide; text and media have independent space. */
+.ss-person {
+  max-height: calc(100svh - 12rem);
+  gap: clamp(1rem, 3vw, 3rem);
+}
+
+.ss-person-with-media {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  text-align: left;
+}
+
+.ss-person .ss-text {
+  min-width: 0;
+  min-height: 0;
+}
+
+.ss-person .slide-msg {
+  max-height: 48svh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: 0.5rem 0.75rem 0.5rem 0;
+  font-size: clamp(1.1rem, 2.6vw, 2.4rem);
+  overflow-wrap: anywhere;
+}
+
+.ss-person .w {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.ss-person .slide-msg:focus-visible {
+  outline: 1px solid var(--violet);
+  outline-offset: 4px;
+}
+
+.ss-person .slide-name {
+  margin-top: 1rem;
+  font-size: clamp(0.9rem, 1.6vw, 1.3rem);
+}
+
+.ss-person-media {
+  min-width: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.ss-person .ss-video video,
+.ss-person .ss-video iframe {
+  width: 100%;
+  height: 50svh;
+  max-height: none;
+  object-fit: contain;
+}
+
+.ss-person-mixed .ss-video video,
+.ss-person-mixed .ss-video iframe {
+  height: 28svh;
+}
+
+.ss-photo-stack {
+  position: relative;
+  height: 44svh;
+  margin: 1rem 1rem 0;
+}
+
+.ss-person-mixed .ss-photo-stack {
+  height: 23svh;
+}
+
+.ss-photo-card {
+  inset: 0;
+  margin: auto;
+  width: 70%;
+  height: 85%;
+  border: 0;
+  padding: 8px 8px 28px;
+  border-radius: 3px;
+  background: #f5f2e9;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+}
+
+.ss-photo-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+
+.ss-photo-card:focus-visible {
+  outline: 3px solid var(--violet);
+  outline-offset: 3px;
+}
+
+.ss-photo-count {
+  display: block;
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.ss-status {
+  position: absolute;
+  bottom: 4.5rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 2;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.slideshow.is-paused .ss-layer {
+  animation-play-state: paused;
+}
+
+@media (max-width: 700px) {
+  .ss-person-with-media {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .ss-person {
+    gap: 0.8rem;
+  }
+  .ss-person-with-media .slide-msg {
+    max-height: 23svh;
+  }
+  .ss-person-media {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+  }
+  .ss-person-media > * {
+    flex: 1;
+    min-width: 0;
+  }
+  .ss-photo-stack {
+    height: 25svh;
+    margin: 0.5rem;
+  }
+  .ss-person-mixed .ss-photo-stack {
+    height: 22svh;
+  }
+  .ss-person .ss-video video, .ss-person .ss-video iframe {
+    height: 25svh;
+  }
+  .slide-controls {
+    gap: 0.4rem;
+  }
+  .ss-count {
+    font-size: 0.8rem;
+  }
+}
+
+.ss-photo-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 0.75rem;
+}
+
+.ss-photo-controls .ss-photo-count {
+  margin: 0;
+}
+
+.ss-person .ss-video {
+  position: relative;
+}
+
+.ss-video-expand {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+}
+
+.ss-media-viewer {
+  width: min(1400px, calc(100vw - 2rem));
+  max-height: calc(100svh - 2rem);
+  padding: 1rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  background: #05060f;
+  color: var(--text);
+}
+
+.ss-media-viewer::backdrop {
+  background: rgba(0, 0, 0, 0.94);
+}
+
+.ss-viewer-close {
+  display: block;
+  margin: 0 0 0.75rem auto;
+}
+
+.ss-viewer-stage {
+  height: 70svh;
+  display: grid;
+  place-items: center;
+}
+
+.ss-viewer-stage img, .ss-viewer-stage video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  min-height: 0;
+}
+
+.ss-viewer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
 }
