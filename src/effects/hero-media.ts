@@ -1,6 +1,6 @@
 import { query, reducedMotion } from '../lib/ui';
 
-import { heroMedia as media } from '../lib/hero-assets';
+import { heroRotation as media } from '../lib/hero-assets';
 
 export function setupHeroMedia() {
   const root = query('#heroMedia');
