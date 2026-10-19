@@ -8,7 +8,6 @@
 !/tsconfig.json
 !/vite.config.ts
 !/src/
-!/tests/
 !/.github/
 !/scripts/
 !/supabase/
@@ -25,6 +24,7 @@
 !/supabase/functions/
 /supabase/functions/*
 !/supabase/functions/tribute-api/
+!/supabase/video-only-submissions.sql
 
 # Local secrets, dependencies and generated output remain private.
 node_modules

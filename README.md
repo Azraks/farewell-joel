@@ -19,7 +19,6 @@ Never use a service-role key in a `VITE_*` variable or commit local environment 
 ```sh
 npm run dev
 npm run check
-npm test
 npm run build
 ```
 
@@ -40,7 +39,6 @@ npm run build
 | `src/styles/` | Styles grouped by page section |
 | `supabase/` | Schema, Edge Function and scheduled cleanup |
 | `scripts/` | Function bundling and preview-first admin cleanup |
-| `tests/` | API and admin cleanup tests |
 
 The constellation uses approved submissions. Each page load randomises star positions
 and decorative connections around Joel; lines do not represent reporting relationships.

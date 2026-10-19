@@ -111,7 +111,7 @@ export function createHandler(backend: Backend, allowedOrigins: string[], cleanu
         return respond({ status: 'ready', signedUrl: await backend.signUpload(file.path) });
       }
       if (body.action === 'submit') {
-        const message = validateMessage(body.message);
+        const message = validateMessage(body.message, batch.manifest.length > 0);
         if (message.video_link && batch.manifest.some((file) => file.kind === 'video')) throw new InputError('Choose a video upload or a video link, not both.');
         verifyUploadedFiles(batch.manifest, await backend.listFiles(batch.manifest));
         await backend.rpc('finish_tribute_batch', { p_id: body.id, p_hash: tokenHash, p_message: message });

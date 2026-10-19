@@ -37,7 +37,7 @@ export function validateUploads(id: string, files: unknown): UploadManifest[] {
   });
 }
 
-export function validateMessage(input: unknown): MessageInput {
+export function validateMessage(input: unknown, hasUploadedMedia = false): MessageInput {
   if (!input || typeof input !== 'object') throw new InputError('Please enter your message.');
   const fields = input as Record<string, unknown>;
   function text(key: string, limit: number, required = false): string {
@@ -54,8 +54,10 @@ export function validateMessage(input: unknown): MessageInput {
       if (url.protocol !== 'https:' || url.username || url.password) throw new Error();
     } catch { throw new InputError('Please use a valid HTTPS video link.'); }
   }
+  const message = text('message', 1500);
+  if (!message && !link && !hasUploadedMedia) throw new InputError('Please write a message or add a photo or video.');
   return { name: text('name', 80, true), team: text('team', 80) || null,
-    message: text('message', 1500, true), video_link: link || null, is_test: fields.is_test === true };
+    message, video_link: link || null, is_test: fields.is_test === true };
 }
 
 /** Verify server-reported storage metadata rather than trusting the browser's declaration. */

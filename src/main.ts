@@ -5,6 +5,7 @@ import './styles/main.css';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { site } from './config';
 import { fetchTributes, type Tribute } from './lib/data';
+import { hasWallContent } from './lib/tribute-visibility';
 import { query, reducedMotion, toast } from './lib/ui';
 import { readDeletionCredential } from './lib/submission';
 import { setupReceiptCopy, showDeletionView } from './lib/deletion';
@@ -49,7 +50,7 @@ async function main() {
 
   const slideshow = createSlideshow({
     root: query('#slideshow'),
-    getTributes: () => tributes,
+    getTributes: () => tributes.filter(hasWallContent),
     videoHtml: (t, autoplay = false) => videoHtml(t, autoplay),
     onEmpty: () => toast('No messages to show yet.'),
   });
@@ -87,11 +88,11 @@ async function main() {
       return;
     }
 
-    constellation.setTributes(tributes);
+    constellation.setTributes(tributes.filter(hasWallContent));
     renderWall(tributes);
     renderVideos(tributes);
     const stats: Array<[HTMLElement, number]> = [
-      [query('#statMessages'), tributes.length],
+      [query('#statMessages'), tributes.filter(hasWallContent).length],
       [query('#statVideos'), tributes.filter(hasVideo).length],
       [query('#statTeams'), new Set(tributes.map(tribute => tribute.team?.trim().toLowerCase()).filter(Boolean)).size],
     ];

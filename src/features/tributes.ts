@@ -4,6 +4,7 @@ import { mediaUrl, photoUrls, type Tribute } from '../lib/data';
 import { embedUrl, escapeHtml, initials, youtubeThumb } from '../lib/media';
 import { query, reducedMotion, canHover } from '../lib/ui';
 import { setupVideoThumbnails } from '../lib/video-thumbnail';
+import { hasWallContent } from '../lib/tribute-visibility';
 
 function hash(str: string): number {
   let h = 2166136261;
@@ -120,6 +121,7 @@ function layoutWall(force = false) {
 }
 
 export function renderWall(tributes: Tribute[]) {
+  tributes = tributes.filter(hasWallContent);
   stopWallThumbnails();
   wallRevealTriggers.forEach(trigger => trigger.kill());
   wallRevealTriggers = [];

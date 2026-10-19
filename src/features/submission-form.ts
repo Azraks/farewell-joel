@@ -182,7 +182,7 @@ export function setupForm(onSubmitted: () => Promise<void>) {
           message: data.get('message'),
           video_link: videoMode === 'link' ? linkInput.value : null,
           is_test: isTestSubmission,
-        });
+        }, Boolean(video) || selectedPhotos.length > 0);
         if (video && video.size > MAX_VIDEO_BYTES) throw new Error('Video must be 20 MB or smaller.');
         if (video && !/^video\/(mp4|quicktime|webm)$/.test(video.type)) throw new Error('Please upload an MP4, MOV or WebM video.');
         if (!data.get('consent')) throw new Error('Please tick the consent box.');

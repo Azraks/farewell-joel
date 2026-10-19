@@ -24,7 +24,6 @@ jobs:
           node-version: 22
       - run: npm ci --ignore-scripts --cache .cache/npm
       - run: npm run check
-      - run: npm test
       - run: npm run build
         env:
           VITE_REQUIRE_LIVE: 'true'

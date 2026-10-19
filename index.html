@@ -127,8 +127,9 @@
           </div>
 
           <label class="field">
-            <span>Your message *</span>
-            <textarea name="message" maxlength="1500" rows="6" required placeholder="Share a memory, a thank-you, or wishes for the next chapter…"></textarea>
+            <span>Your message</span>
+            <textarea name="message" maxlength="1500" rows="6" aria-describedby="messageHint" placeholder="Share a memory, a thank-you, or wishes for the next chapter…"></textarea>
+            <small id="messageHint">Optional with photos or a video. Photos appear in Messages; videos appear in Video messages.</small>
             <small class="counter"><span id="charCount">0</span> / 1500</small>
           </label>
 

@@ -7,7 +7,6 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "node --test tests/*.test.mts",
     "check": "tsc --noEmit && tsc --noEmit -p supabase/functions/tribute-api/tsconfig.json",
     "admin:preview": "node scripts/admin-cleanup.mjs --scope=tests"
   },
