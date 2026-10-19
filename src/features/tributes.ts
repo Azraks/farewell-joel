@@ -3,6 +3,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { mediaUrl, photoUrls, type Tribute } from '../lib/data';
 import { embedUrl, escapeHtml, initials, youtubeThumb } from '../lib/media';
 import { query, reducedMotion, canHover } from '../lib/ui';
+import { setupVideoThumbnails } from '../lib/video-thumbnail';
 
 function hash(str: string): number {
   let h = 2166136261;
@@ -49,6 +50,9 @@ function cosmicBanner(t: Tribute): string {
 let cards: HTMLElement[] = [];
 let wallColumns = 0;
 let wallRevealTriggers: ScrollTrigger[] = [];
+let stopWallThumbnails = () => {};
+let stopGalleryThumbnails = () => {};
+let stopPlayerThumbnail = () => {};
 
 function cardMedia(t: Tribute): string {
   const photos = photoUrls(t);
@@ -64,7 +68,7 @@ function cardMedia(t: Tribute): string {
     const file = mediaUrl(t.video_path);
     const thumb = t.video_link ? youtubeThumb(t.video_link) : null;
     const inner = file
-      ? '<span class="video-placeholder" aria-hidden="true">🎬</span>'
+      ? `<span class="video-placeholder" data-video-thumbnail="${escapeHtml(file)}" aria-hidden="true">🎬</span>`
       : thumb
         ? `<img src="${escapeHtml(thumb)}" alt="" loading="lazy" />`
         : '';
@@ -116,12 +120,14 @@ function layoutWall(force = false) {
 }
 
 export function renderWall(tributes: Tribute[]) {
+  stopWallThumbnails();
   wallRevealTriggers.forEach(trigger => trigger.kill());
   wallRevealTriggers = [];
   if (cards.length) gsap.killTweensOf(cards);
   query('#wallEmpty').hidden = tributes.length > 0;
   buildCards(tributes);
   layoutWall(true);
+  stopWallThumbnails = setupVideoThumbnails(query('#wall'));
 
   if (!reducedMotion && cards.length) {
     gsap.set(cards, { opacity: 0 });
@@ -145,6 +151,8 @@ function attachSpotlight(el: HTMLElement) {
 }
 
 export function renderVideos(tributes: Tribute[]) {
+  stopGalleryThumbnails();
+  stopPlayerThumbnail();
   const gallery = query('#videoGrid');
   const videos = tributes.filter(hasVideo).sort((a, b) =>
     (b.video_priority ?? 0) - (a.video_priority ?? 0) || a.id.localeCompare(b.id),
@@ -179,17 +187,21 @@ export function renderVideos(tributes: Tribute[]) {
     button.className = 'video-gallery-pick';
     button.setAttribute('aria-label', `Select video: ${tribute.video_title || tribute.name}`);
     const thumbnail = tribute.video_link ? youtubeThumb(tribute.video_link) : photoUrls(tribute)[0];
-    button.innerHTML = `${thumbnail ? `<img src="${escapeHtml(thumbnail)}" alt="" loading="lazy" />` : '<span aria-hidden="true">▶</span>'}<span>${escapeHtml(tribute.video_title || tribute.name)}</span>`;
+    const file = mediaUrl(tribute.video_path);
+    const fallback = `<span ${file ? `data-video-thumbnail="${escapeHtml(file)}"` : ''} aria-hidden="true">▶</span>`;
+    button.innerHTML = `${thumbnail ? `<img src="${escapeHtml(thumbnail)}" alt="" loading="lazy" />` : fallback}<span>${escapeHtml(tribute.video_title || tribute.name)}</span>`;
     button.addEventListener('click', () => showVideo(index));
     picks.appendChild(button);
     return button;
   });
 
   function showVideo(index: number) {
+    stopPlayerThumbnail();
     selected = (index + videos.length) % videos.length;
     const tribute = videos[selected]!;
     // Replacing the player stops the previous video; selecting never starts playback.
     player.innerHTML = videoHtml(tribute, false);
+    stopPlayerThumbnail = setupVideoThumbnails(player);
     caption.innerHTML = `
       <b>${escapeHtml(tribute.video_title || tribute.name)}</b>
       <small>${escapeHtml(tribute.name)}${tribute.team ? ` · ${escapeHtml(tribute.team)}` : ''}</small>
@@ -222,11 +234,12 @@ export function renderVideos(tributes: Tribute[]) {
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) showVideo(selected + (dx < 0 ? 1 : -1));
   }, { passive: true });
   showVideo(selected);
+  stopGalleryThumbnails = setupVideoThumbnails(picks);
 }
 
 export function videoHtml(t: Tribute, autoplay = true): string {
   const file = mediaUrl(t.video_path);
-  if (file) return `<video src="${escapeHtml(file)}" controls playsinline preload="none" ${autoplay ? 'autoplay' : ''}></video>`;
+  if (file) return `<video src="${escapeHtml(file)}" controls playsinline preload="none" ${autoplay ? 'autoplay' : `data-video-thumbnail="${escapeHtml(file)}"`}></video>`;
   if (t.video_link) {
     const embed = embedUrl(t.video_link);
     if (embed) return `<iframe src="${escapeHtml(autoplay ? embed : embed.replace(/autoplay=1/g, 'autoplay=0'))}" title="Video from ${escapeHtml(t.name)}" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
