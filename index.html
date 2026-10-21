@@ -72,7 +72,7 @@
         <div class="section-head reveal">
           <p class="eyebrow">02 — Constellation of Thanks</p>
           <h2>Every message is a star</h2>
-          <p class="lead">Hover a star to see who left it. Click to read their message. The constellation changes with every visit.</p>
+          <p class="lead">A real constellation, a few stars from our memories. Hover or tap a star to explore a message. Choose “New stars” to discover another constellation and more memories.</p>
         </div>
         <div class="stats reveal">
           <div class="stat"><strong id="statMessages">0</strong><span>Messages</span></div>
@@ -81,7 +81,17 @@
         <div class="constellation-wrap reveal">
           <canvas id="constellationCanvas"></canvas>
           <div class="star-tooltip" id="starTooltip"></div>
+          <div class="constellation-caption" aria-live="polite" aria-atomic="true">
+            <a id="constellationName" target="_blank" rel="noopener noreferrer"></a>
+          </div>
+          <div class="constellation-actions">
+            <button id="refreshConstellation" class="btn btn-ghost" type="button" aria-label="Show another constellation and shuffle messages" aria-controls="constellationCanvas"><span aria-hidden="true">↻</span> New stars</button>
+          </div>
         </div>
+        <p class="constellation-credits">
+          <a id="constellationCredits" target="_blank" rel="noopener noreferrer">Star pattern data &amp; license</a>
+          <span>· Olaf Frohn (d3-celestial)</span>
+        </p>
       </section>
 
       <!-- 4. MESSAGES -->
