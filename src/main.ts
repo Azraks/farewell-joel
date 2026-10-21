@@ -94,7 +94,6 @@ async function main() {
     const stats: Array<[HTMLElement, number]> = [
       [query('#statMessages'), tributes.filter(hasWallContent).length],
       [query('#statVideos'), tributes.filter(hasVideo).length],
-      [query('#statTeams'), new Set(tributes.map(tribute => tribute.team?.trim().toLowerCase()).filter(Boolean)).size],
     ];
     stats.forEach(([element, value]) => {
       if (animateCounters) countUp(element, value);
