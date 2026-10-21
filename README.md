@@ -1,51 +1,81 @@
 # Farewell site for Joel
 
-A public farewell page with messages, photos and short videos. GitHub Pages hosts the
-website; Supabase stores submissions and media. Visitors do not need an account.
-Messages appear after organiser approval, and each submission gets a private deletion link.
+A public farewell page for sharing messages, photos and short videos. GitHub Pages
+hosts the website; Supabase stores submissions and media. Visitors do not need an
+account. Submissions appear immediately, and each submission gets a private deletion link.
+
+## Features
+
+The hero photo viewer includes the full built-in collection. Messages and photos
+appear on the tribute wall; videos have a separate gallery. The slideshow presents
+one contributor at a time, with scrollable text, stacked photos and video playback.
+
+The constellation uses real star patterns, with contributors assigned to sampled
+positions. Video-only submissions appear in the video gallery. Constellation lines
+do not represent reporting relationships.
+
+Uploads support up to four photos (source ≤20 MiB, compressed JPEG ≤5 MiB each),
+plus one video (MP4/MOV/WebM ≤20 MiB) or an HTTPS video link. Video transcoding
+is not provided.
 
 ## Development
 
 Use Node 22.18 or later. CI uses Node 22; dependencies are pinned in `package-lock.json`.
 
 ```sh
-# Only when dependencies are missing; installs and cache stay in the project.
 npm ci --ignore-scripts --cache .cache/npm
 ```
 
-Copy `.env.example` to `.env.local` and fill in the Supabase URL and publishable / anon key.
-Never use a service-role key in a `VITE_*` variable or commit local environment files.
+Create `.env.local` in the project root:
 
-```sh
-npm run dev
-npm run check
-npm run build
+```dotenv
+VITE_SUPABASE_URL=your-project-url
+VITE_SUPABASE_ANON_KEY=your-publishable-or-anon-key
 ```
 
-- `VITE_DEMO_MODE=true`: fictional messages and Mission Log entries; uploads and deletions are simulated.
-- `VITE_TEST_SUBMISSIONS=true`: real local trial submissions are marked for selective cleanup.
-- Restart the dev server after changing environment variables. GitHub deployment forces both flags off.
+Use a publishable / anon key only. Never put a service-role key in a `VITE_*` variable
+or commit local environment files.
+
+```sh
+npm run dev      # Start the development server
+npm run check    # Check frontend and Edge Function types
+npm run build    # Create the production site in dist/
+npm run preview  # Preview the production build
+```
+
+Optional local settings:
+
+- `VITE_DEMO_MODE=true` shows fictional content and simulates submissions and deletion.
+- `VITE_TEST_SUBMISSIONS=true` marks real trial submissions for selective cleanup.
+
+Restart the development server after changing environment variables. The deployment
+workflow disables both settings.
 
 ## Project layout
 
 | Location | Purpose |
 | --- | --- |
-| `src/main.ts` | Page startup and coordination |
-| `src/config.ts` | Editable names, page text, dates and real Mission Log entries |
-| `src/features/` | Content, tribute views and submission form |
-| `src/effects/` | Page animations, stars, constellation and slideshow |
-| `src/lib/` | Environment, data access, media, upload/deletion API and UI helpers |
-| `src/demo/` | Fictional samples and images; excluded from live builds |
-| `src/styles/` | Styles grouped by page section |
-| `supabase/` | Schema, Edge Function and scheduled cleanup |
-| `scripts/` | Function bundling and preview-first admin cleanup |
+| `index.html` | Page structure and dialog markup |
+| `src/main.ts` | Page startup and feature coordination |
+| `src/config.ts` | Names, page copy, dates and Mission Log entries |
+| `src/assets/hero/` | Built-in photos for the hero rotation and photo viewer |
+| `src/assets/constellations/` | Star pattern data and its third-party `LICENSE` |
+| `src/features/` | Page content, photo viewer, tribute wall, video gallery and submission form |
+| `src/effects/` | Hero rotation, starfield, constellation, slideshow and animation helpers |
+| `src/lib/` | Data access, uploads, deletion, media handling and shared utilities |
+| `src/demo/` | Fictional content and sample media for demo mode |
+| `src/styles/main.css` | Page, component and responsive styles |
+| `supabase/functions/tribute-api/` | Edge Function for submissions, deletion and media cleanup |
+| `supabase/video-only-submissions.sql` | Database migration allowing video-only submissions |
+| `scripts/admin-cleanup.mjs` | Administrative cleanup utility with a preview by default |
+| `.github/workflows/deploy.yml` | GitHub Pages build and deployment |
+| `vite.config.ts` | Build settings, asset handling and deployment base path |
+| `tsconfig.json` | Frontend TypeScript settings |
+| `package.json` / `package-lock.json` | Commands, dependencies and locked versions |
 
-The constellation uses approved submissions. Each page load randomises star positions
-and decorative connections around Joel; lines do not represent reporting relationships.
-Empty real milestones hide Mission Log outside demo mode.
+## Star pattern attribution
 
-## Deployment and maintenance
-Uploads allow four photos (source ≤20 MiB, compressed JPEG ≤5 MiB each), plus one video
-(MP4/MOV/WebM ≤20 MiB) or an HTTPS video link. Media URLs are public even before approval.
-No video transcoding is provided. Confirm real content and keep company information out
-of both the page and uploads before sharing.
+The star pattern data is adapted from [d3-celestial](https://github.com/ofrohn/d3-celestial)
+by Olaf Frohn under the BSD 3-Clause License. Its copyright notice, conditions and
+disclaimer are retained in [the data license](src/assets/constellations/LICENSE),
+which is also linked from the page. This license applies to the third-party data.
