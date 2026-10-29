@@ -10,9 +10,11 @@ The hero photo viewer includes the full built-in collection. Messages and photos
 appear on the tribute wall; videos have a separate gallery. The slideshow presents
 one contributor at a time, with scrollable text, stacked photos and video playback.
 
-The constellation uses real star patterns, with contributors assigned to sampled
-positions. Video-only submissions appear in the video gallery. Constellation lines
-do not represent reporting relationships.
+The constellation displays every submission with a message or photo as a star
+around Joel’s bright centre star. Positions are randomised on each page load;
+hover to see a contributor’s name, or click or tap to open their tribute. Video-only
+submissions appear in the video gallery. Constellation lines do not represent
+reporting relationships.
 
 Uploads support up to four photos (source ≤20 MiB, compressed JPEG ≤5 MiB each),
 plus one video (MP4/MOV/WebM ≤20 MiB) or an HTTPS video link. Video transcoding
@@ -59,7 +61,6 @@ workflow disables both settings.
 | `src/main.ts` | Page startup and feature coordination |
 | `src/config.ts` | Names, page copy, dates and Mission Log entries |
 | `src/assets/hero/` | Built-in photos for the hero rotation and photo viewer |
-| `src/assets/constellations/` | Star pattern data and its third-party `LICENSE` |
 | `src/features/` | Page content, photo viewer, tribute wall, video gallery and submission form |
 | `src/effects/` | Hero rotation, starfield, constellation, slideshow and animation helpers |
 | `src/lib/` | Data access, uploads, deletion, media handling and shared utilities |
@@ -72,10 +73,3 @@ workflow disables both settings.
 | `vite.config.ts` | Build settings, asset handling and deployment base path |
 | `tsconfig.json` | Frontend TypeScript settings |
 | `package.json` / `package-lock.json` | Commands, dependencies and locked versions |
-
-## Star pattern attribution
-
-The star pattern data is adapted from [d3-celestial](https://github.com/ofrohn/d3-celestial)
-by Olaf Frohn under the BSD 3-Clause License. Its copyright notice, conditions and
-disclaimer are retained in [the data license](src/assets/constellations/LICENSE),
-which is also linked from the page. This license applies to the third-party data.

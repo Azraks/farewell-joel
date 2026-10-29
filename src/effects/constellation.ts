@@ -1,8 +1,10 @@
 import type { Tribute } from '../lib/data';
-import { chooseConstellation, projectConstellation, sampleConstellationTributes } from '../lib/constellation-patterns';
-import licenseUrl from '../assets/constellations/LICENSE?url';
 
-/** A real sky pattern with a small rotating sample of tribute stars. */
+/**
+ * "Constellation of thanks": each tribute becomes a star, linked to the honoree
+ * (the bright centre star) via decorative lines. Positions and connections are randomised on every page load;
+ * they do not represent reporting relationships.
+ */
 interface Node {
   x: number; // 0..1
   y: number; // 0..1
@@ -22,27 +24,13 @@ export function createConstellation(
   let w = 0;
   let h = 0;
   let nodes: Node[] = [];
-  let tributes: Tribute[] = [];
-  let previousId: string | null = null;
-  try { previousId = sessionStorage.getItem('farewell-constellation'); } catch { /* Storage may be disabled. */ }
-  let pattern = chooseConstellation(previousId);
-  try { sessionStorage.setItem('farewell-constellation', pattern.id); } catch { /* Random selection still works. */ }
-  let positions = projectConstellation(pattern);
-  let edges = pattern.edges;
-  const nameLink = document.querySelector<HTMLAnchorElement>('#constellationName')!;
-  function updateName() {
-    nameLink.textContent = pattern.name + ' ↗';
-    nameLink.href = 'https://www.google.com/search?q=' + encodeURIComponent(pattern.name + ' constellation stars astronomy');
-    nameLink.setAttribute('aria-label', `Learn about ${pattern.name} on Google (opens in a new tab)`);
-  }
-  updateName();
-  document.querySelector<HTMLAnchorElement>('#constellationCredits')!.href = licenseUrl;
+  let edges: Array<[number, number]> = [];
   let reveal = 0; // 0..1 animation progress
   let visible = false;
   let hover = -1;
 
   const centre: Node = { x: 0.5, y: 0.5, r: 6, label: centreLabel, tribute: null, phase: 0 };
-  nodes = positions.map((position, index) => index === 0 ? centre : ({ ...position, r: 3.2, label: pattern.name, tribute: null, phase: Math.random() * 6 }));
+  nodes = [centre];
 
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -52,41 +40,67 @@ export function createConstellation(
     canvas.width = w * dpr;
     canvas.height = h * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    // Uniform screen-space scaling preserves the actual shape on phones too.
-    const scale = Math.max(1, Math.min(w - 90, h - 160));
-    nodes.forEach((node, index) => {
-      node.x = 0.5 + positions[index]!.x * scale / Math.max(1, w);
-      node.y = 0.46 + positions[index]!.y * scale / Math.max(1, h);
-    });
+  }
+
+  function place(existing: Node[]): { x: number; y: number } {
+    let best = { x: 0.5, y: 0.5 };
+    let bestDist = -1;
+    // Choose the most spacious of several random positions to avoid crowded stars.
+    for (let i = 0; i < 14; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = 0.12 + Math.sqrt(Math.random()) * 0.36;
+      const c = { x: 0.5 + Math.cos(angle) * radius, y: 0.5 + Math.sin(angle) * radius * 0.95 };
+      let d = Infinity;
+      for (const n of existing) d = Math.min(d, (n.x - c.x) ** 2 + (n.y - c.y) ** 2);
+      if (d > bestDist) {
+        bestDist = d;
+        best = c;
+      }
+    }
+    return best;
+  }
+
+  function buildEdges() {
+    // Prim's MST over screen-space distance
+    const n = nodes.length;
+    const inTree = new Array(n).fill(false);
+    const dist = new Array(n).fill(Infinity);
+    const parent = new Array(n).fill(-1);
+    dist[0] = 0;
+    edges = [];
+    for (let k = 0; k < n; k++) {
+      let u = -1;
+      for (let i = 0; i < n; i++) if (!inTree[i] && (u === -1 || dist[i] < dist[u])) u = i;
+      inTree[u] = true;
+      if (parent[u] !== -1) edges.push([parent[u], u]);
+      for (let v = 0; v < n; v++) {
+        if (inTree[v]) continue;
+        const d = ((nodes[u]!.x - nodes[v]!.x) * w) ** 2 + ((nodes[u]!.y - nodes[v]!.y) * h) ** 2;
+        if (d < dist[v]) {
+          dist[v] = d;
+          parent[v] = u;
+        }
+      }
+    }
   }
 
   function setTributes(list: Tribute[]) {
-    tributes = [...list];
-    const selected = sampleConstellationTributes(list, nodes.length - 1);
-    nodes.forEach((node, index) => {
-      if (index === 0) return;
-      node.tribute = selected[index - 1] ?? null;
-      node.label = node.tribute?.name ?? `${pattern.name} · star ${index + 1}`;
-    });
+    nodes = [centre];
+    // Shuffle placement order so submission date gives no fixed visual prominence.
+    const shuffled = [...list];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!];
+    }
+    for (const t of shuffled) {
+      const p = place(nodes);
+      nodes.push({ ...p, r: 3.2, label: t.name, tribute: t, phase: Math.random() * 6 });
+    }
+    buildEdges();
     hover = -1;
     tooltip.classList.remove('show');
     canvas.style.cursor = 'default';
   }
-
-  document.querySelector<HTMLButtonElement>('#refreshConstellation')!.addEventListener('click', () => {
-    // Reuse loaded submissions and bundled star data; no network requests or page reload.
-    pattern = chooseConstellation(pattern.id);
-    positions = projectConstellation(pattern);
-    edges = pattern.edges;
-    nodes = positions.map((position, index) => index === 0 ? centre : ({
-      ...position, r: 3.2, label: pattern.name, tribute: null, phase: Math.random() * 6,
-    }));
-    reveal = 0;
-    setTributes(tributes);
-    resize();
-    updateName();
-    try { sessionStorage.setItem('farewell-constellation', pattern.id); } catch { /* Optional refresh history. */ }
-  });
 
   const io = new IntersectionObserver(([e]) => (visible = !!e?.isIntersecting), { threshold: 0.25 });
   io.observe(canvas);
@@ -133,6 +147,7 @@ export function createConstellation(
 
   window.addEventListener('resize', () => {
     resize();
+    buildEdges();
   });
   resize();
 
